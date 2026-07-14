@@ -1,0 +1,239 @@
+/* ===================================================
+   THUNDER'S DIARY — styles
+   Theme: warm white paper, soft ink colors, quiet motion
+   =================================================== */
+
+:root{
+  --paper: #fdfcf7;
+  --paper-edge: #f1ede2;
+  --ink-default: #2b2b3d;
+  --accent-purple: #7C3AED;
+  --accent-purple-soft: #A78BFA;
+  --accent-blue: #60A5FA;
+  --line: #e4ddc9;
+  --shadow: rgba(60, 45, 20, 0.18);
+}
+
+*{ box-sizing: border-box; }
+
+html,body{
+  margin:0; padding:0; height:100%;
+  font-family: 'Cormorant Garamond', serif;
+  background: linear-gradient(160deg, #efe7f9, #eaf2fb 60%, #fdfcf7);
+  overflow: hidden;
+}
+
+.hidden{ display:none !important; }
+
+/* ================= COVER PAGE ================= */
+.cover{
+  height:100vh; width:100vw;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:22px;
+}
+
+.book{
+  position:relative;
+  width:min(320px, 70vw);
+  height:min(440px, 70vh);
+  cursor:pointer;
+  transform-style:preserve-3d;
+  transition: transform .9s cubic-bezier(.6,.1,.2,1);
+}
+
+.book-spine{
+  position:absolute; left:-10px; top:0; bottom:0; width:20px;
+  background:linear-gradient(90deg,#3d2b1f,#5a4230);
+  border-radius:6px 0 0 6px;
+}
+
+.book-cover-front{
+  position:relative;
+  height:100%; width:100%;
+  border-radius:6px 10px 10px 6px;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,0.10), transparent 40%),
+    linear-gradient(135deg, #4a3527, #6b4c37 55%, #503926);
+  box-shadow: 0 30px 60px var(--shadow), inset 0 0 40px rgba(0,0,0,0.25);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px;
+  border:1px solid rgba(255,255,255,0.06);
+}
+
+.clasp{ margin-bottom:6px; filter:drop-shadow(0 3px 4px rgba(0,0,0,.4)); }
+
+.book-title{
+  font-family:'Cormorant Garamond', serif;
+  font-style:italic; font-weight:600;
+  color:#f6ecd9;
+  text-align:center;
+  font-size:clamp(28px, 4.5vw, 38px);
+  line-height:1.15;
+  margin:0;
+  text-shadow:0 2px 6px rgba(0,0,0,.35);
+}
+
+.book-sub{
+  color:#e4d3b8; opacity:.75; font-style:italic; margin:0; font-size:15px;
+}
+
+.book.opening{
+  transform: rotateY(-18deg) scale(1.05);
+}
+
+.tap-hint{
+  color:#6b5b7a; font-style:italic; font-size:15px; opacity:.8;
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse{ 0%,100%{opacity:.5} 50%{opacity:.95} }
+
+/* ================= ONBOARDING ================= */
+.onboarding{
+  position:fixed; inset:0; z-index:50;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(124,58,237,0.08);
+  backdrop-filter: blur(6px);
+}
+
+.onboarding-card{
+  width:min(420px, 88vw);
+  background: rgba(255,255,255,0.75);
+  border:1px solid rgba(255,255,255,0.6);
+  border-radius:24px;
+  padding:34px 30px;
+  box-shadow: 0 20px 50px rgba(124,58,237,0.18);
+  backdrop-filter: blur(14px);
+  text-align:center;
+}
+
+.onboarding-card h2{
+  margin:0 0 6px; font-weight:600; color:#4c3575; font-size:26px;
+}
+.onboarding-card p{ margin:0 0 18px; color:#6b5b8a; }
+
+#obName{
+  width:100%; padding:12px 14px; border-radius:14px;
+  border:1px solid var(--accent-purple-soft); font-size:17px;
+  font-family:'Cormorant Garamond', serif;
+  margin-bottom:18px; outline:none; background:#fff;
+}
+#obName:focus{ border-color:var(--accent-purple); }
+
+.choice-row{ display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
+
+.choice{
+  padding:11px 14px; border-radius:14px; border:1.5px solid var(--accent-purple-soft);
+  background:#fff; color:#4c3575; font-size:16px; cursor:pointer;
+  font-family:'Cormorant Garamond', serif;
+  transition:.2s;
+}
+.choice.selected, .choice:hover{
+  background:linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+  color:#fff; border-color:transparent;
+}
+
+.btn-next{
+  padding:11px 26px; border-radius:16px; border:none; cursor:pointer;
+  background:linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+  color:#fff; font-size:16px; font-family:'Cormorant Garamond', serif;
+  box-shadow:0 8px 20px rgba(124,58,237,0.3);
+}
+
+/* ================= DIARY PAGE ================= */
+.diary{ height:100vh; width:100vw; display:flex; flex-direction:column; }
+
+.page-toolbar{
+  display:flex; align-items:center; gap:10px; padding:10px 16px;
+  background:rgba(255,255,255,0.6); backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--line);
+}
+
+.ink-colors{ display:flex; gap:8px; margin-right:auto; }
+.swatch{
+  width:24px; height:24px; border-radius:50%; border:2px solid #fff;
+  box-shadow:0 0 0 1px rgba(0,0,0,0.15); cursor:pointer;
+}
+.swatch.active{ box-shadow:0 0 0 2px var(--accent-purple); }
+
+.tool-btn{
+  border:none; background:rgba(124,58,237,0.08); color:#5a3d8a;
+  padding:7px 12px; border-radius:12px; font-size:14px; cursor:pointer;
+  font-family:'Cormorant Garamond', serif;
+}
+.tool-btn:hover{ background:rgba(124,58,237,0.16); }
+.tool-btn.active{ background:var(--accent-purple); color:#fff; }
+
+.page-wrap{
+  flex:1; display:flex; justify-content:center; align-items:flex-start;
+  overflow-y:auto; padding:26px 16px 60px;
+}
+
+.paper{
+  width:min(720px, 100%);
+  min-height:80vh;
+  background: var(--paper);
+  border-radius:14px;
+  box-shadow:0 20px 50px rgba(80,60,30,0.12), 0 0 0 1px var(--paper-edge);
+  padding:36px 34px 30px;
+  position:relative;
+  background-image: repeating-linear-gradient(
+      to bottom, transparent 0 38px, var(--line) 38px 39px
+    );
+}
+
+.handwriting{
+  font-family:'Caveat', cursive;
+}
+
+.entry-line{
+  font-family:'Cormorant Garamond', serif; font-style:italic; color:#8b7aa8;
+  margin-bottom:6px; font-size:18px; min-height:24px;
+}
+
+.typed-input{
+  width:100%; border:none; outline:none; resize:none;
+  background:transparent; font-size:26px; line-height:39px;
+  color: var(--ink-default);
+  transition: opacity 1.1s ease, filter 1.1s ease;
+}
+
+.typed-input.absorbing{
+  opacity:0.08; filter:blur(1.5px);
+}
+
+.draw-canvas{
+  width:100%; height:260px; touch-action:none; cursor:crosshair;
+  transition: opacity 1.1s ease, filter 1.1s ease;
+}
+.draw-canvas.absorbing{ opacity:0.08; filter:blur(1.5px); }
+
+.reply-area{
+  font-family:'Caveat', cursive;
+  font-size:29px; line-height:1.5; color: var(--accent-purple);
+  min-height:40px; white-space:pre-wrap;
+  transition: opacity 2.2s ease 1.5s;
+}
+.reply-area.fading{ opacity:0; }
+
+.thinking-dot{
+  display:inline-block; width:9px; height:9px; border-radius:50%;
+  background: var(--accent-purple-soft); margin-right:5px;
+  animation: blot 1.2s ease-in-out infinite;
+}
+.thinking-dot:nth-child(2){ animation-delay:.2s; }
+.thinking-dot:nth-child(3){ animation-delay:.4s; }
+@keyframes blot{ 0%,100%{ transform:scale(1); opacity:.5 } 50%{ transform:scale(1.4); opacity:1 } }
+
+.limit-note{
+  margin-top:20px; font-family:'Cormorant Garamond', serif; font-style:italic;
+  color:#a08bbd; font-size:14px; text-align:right;
+}
+
+/* Memory list */
+.memory-list{ font-family:'Cormorant Garamond', serif; font-style:italic; color:#6b5b8a; }
+.memory-list div{ padding:4px 0; border-bottom:1px dashed var(--line); }
+
+@media (max-width: 640px){
+  .book{ width:78vw; height:60vh; }
+  .paper{ padding:26px 20px; }
+}

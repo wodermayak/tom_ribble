@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<title>Thunder's Diary</title>
+
+<!-- Handwriting + title fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ============ COVER PAGE ============ -->
+<div id="cover" class="cover">
+  <div class="book" id="book">
+    <div class="book-spine"></div>
+    <div class="book-cover-front">
+      <div class="clasp" id="clasp">
+        <svg viewBox="0 0 40 60" width="34" height="50">
+          <rect x="6" y="24" width="28" height="26" rx="4" fill="#8a6a4a"/>
+          <path d="M12 24 V14 a8 8 0 0 1 16 0 V24" stroke="#8a6a4a" stroke-width="4" fill="none"/>
+          <circle cx="20" cy="36" r="3.2" fill="#f4ead9"/>
+        </svg>
+      </div>
+      <h1 class="book-title">Thunder's<br>Diary</h1>
+      <p class="book-sub">a place that listens</p>
+    </div>
+  </div>
+  <p class="tap-hint" id="tapHint">tap the diary to open it</p>
+</div>
+
+<!-- ============ ONBOARDING MODAL ============ -->
+<div id="onboarding" class="onboarding hidden">
+  <div class="onboarding-card">
+    <div class="step" data-step="1">
+      <h2>Hi, I'm your diary.</h2>
+      <p>What should I call you?</p>
+      <input type="text" id="obName" placeholder="Your name" maxlength="30" />
+      <button class="btn-next" data-next="2">Next</button>
+    </div>
+
+    <div class="step hidden" data-step="2">
+      <h2>Nice to meet you.</h2>
+      <p>How should I speak about you?</p>
+      <div class="choice-row" id="obGender">
+        <button class="choice" data-value="she">She / her</button>
+        <button class="choice" data-value="he">He / him</button>
+        <button class="choice" data-value="they">They / them</button>
+      </div>
+      <button class="btn-next" data-next="3">Next</button>
+    </div>
+
+    <div class="step hidden" data-step="3">
+      <h2>One last thing.</h2>
+      <p>What will you mostly use me for?</p>
+      <div class="choice-row" id="obPurpose">
+        <button class="choice" data-value="study">Studying</button>
+        <button class="choice" data-value="personal">Personal thoughts</button>
+        <button class="choice" data-value="both">Both</button>
+      </div>
+      <button class="btn-next" id="obFinish">Begin writing</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DIARY PAGE ============ -->
+<div id="diary" class="diary hidden">
+
+  <div class="page-toolbar">
+    <div class="ink-colors" id="inkColors">
+      <button class="swatch" data-color="#2b2b3d" style="background:#2b2b3d" title="Charcoal ink"></button>
+      <button class="swatch" data-color="#3a4fd9" style="background:#3a4fd9" title="Blue ink"></button>
+      <button class="swatch" data-color="#7C3AED" style="background:#7C3AED" title="Purple ink"></button>
+      <button class="swatch" data-color="#b23b3b" style="background:#b23b3b" title="Red ink"></button>
+    </div>
+    <button id="eraserBtn" class="tool-btn" title="Eraser">✏️‍🧹 Eraser</button>
+    <button id="memoryBtn" class="tool-btn" title="What do you remember?">📖 Memory</button>
+    <button id="closeBookBtn" class="tool-btn" title="Close diary">✕ Close</button>
+  </div>
+
+  <div class="page-wrap">
+    <div class="paper" id="paper">
+
+      <div class="entry-line" id="greetingLine"></div>
+
+      <!-- typed input (desktop) -->
+      <textarea id="typedInput" class="typed-input handwriting" placeholder="Dear diary..." rows="3"></textarea>
+
+      <!-- drawn input (touch/pen) -->
+      <canvas id="drawCanvas" class="draw-canvas hidden"></canvas>
+
+      <div class="reply-area" id="replyArea"></div>
+
+      <div class="limit-note" id="limitNote"></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/canvas.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
