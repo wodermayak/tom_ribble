@@ -18,7 +18,7 @@
 <div id="cover" class="cover">
   <div class="book" id="book">
     <div class="book-spine"></div>
-    <div class="book-cover-front">
+    <div class="book-cover-front" id="bookCoverFront">
       <div class="clasp" id="clasp">
         <svg viewBox="0 0 40 60" width="34" height="50">
           <rect x="6" y="24" width="28" height="26" rx="4" fill="#8a6a4a"/>
@@ -26,11 +26,20 @@
           <circle cx="20" cy="36" r="3.2" fill="#f4ead9"/>
         </svg>
       </div>
-      <h1 class="book-title">Thunder's<br>Diary</h1>
+      <h1 class="book-title" id="bookTitleText">Thunder's<br>Diary</h1>
       <p class="book-sub">a place that listens</p>
     </div>
   </div>
   <p class="tap-hint" id="tapHint">tap the diary to open it</p>
+
+  <!-- wax seal overlay, shown briefly on close -->
+  <div class="wax-seal hidden" id="waxSeal">
+    <svg viewBox="0 0 100 100" width="90" height="90">
+      <circle cx="50" cy="50" r="46" fill="#8a2a2a"/>
+      <circle cx="50" cy="50" r="46" fill="none" stroke="#5e1717" stroke-width="3"/>
+      <text x="50" y="58" text-anchor="middle" font-size="34" fill="#e9c98a" font-family="serif">T</text>
+    </svg>
+  </div>
 </div>
 
 <!-- ============ ONBOARDING MODAL ============ -->
@@ -62,6 +71,24 @@
         <button class="choice" data-value="personal">Personal thoughts</button>
         <button class="choice" data-value="both">Both</button>
       </div>
+      <button class="btn-next" data-next="4">Next</button>
+    </div>
+
+    <div class="step hidden" data-step="4">
+      <h2>Make it yours.</h2>
+      <p>Give your diary a name and a cover color</p>
+      <input type="text" id="obDiaryName" placeholder="Diary name" maxlength="24" value="Thunder's Diary" />
+      <div class="choice-row cover-color-row" id="obCoverColor">
+        <button class="cover-swatch selected" data-value="brown" style="background:linear-gradient(135deg,#4a3527,#6b4c37)"></button>
+        <button class="cover-swatch" data-value="purple" style="background:linear-gradient(135deg,#5b3a8a,#7C3AED)"></button>
+        <button class="cover-swatch" data-value="blue" style="background:linear-gradient(135deg,#2c4a75,#60A5FA)"></button>
+        <button class="cover-swatch" data-value="green" style="background:linear-gradient(135deg,#2f4a38,#4c7a5a)"></button>
+      </div>
+      <p>How should replies feel?</p>
+      <div class="choice-row" id="obTone">
+        <button class="choice" data-value="short">Short &amp; sweet</button>
+        <button class="choice" data-value="reflective">Longer &amp; reflective</button>
+      </div>
       <button class="btn-next" id="obFinish">Begin writing</button>
     </div>
   </div>
@@ -77,30 +104,48 @@
       <button class="swatch" data-color="#7C3AED" style="background:#7C3AED" title="Purple ink"></button>
       <button class="swatch" data-color="#b23b3b" style="background:#b23b3b" title="Red ink"></button>
     </div>
-    <button id="eraserBtn" class="tool-btn" title="Eraser">✏️‍🧹 Eraser</button>
-    <button id="memoryBtn" class="tool-btn" title="What do you remember?">📖 Memory</button>
-    <button id="closeBookBtn" class="tool-btn" title="Close diary">✕ Close</button>
+    <button id="eraserBtn" class="tool-btn" title="Eraser">Eraser</button>
+    <button id="memoryBtn" class="tool-btn" title="What do you remember?">Memory</button>
+    <button id="insightsBtn" class="tool-btn" title="Streak & stats">Insights</button>
+    <button id="soundBtn" class="tool-btn" title="Toggle ambient sound">Sound: off</button>
+    <button id="notifyBtn" class="tool-btn" title="Toggle daily nudge">Nudge: off</button>
+    <button id="exportBtn" class="tool-btn" title="Export entries as JSON">Export</button>
+    <button id="closeBookBtn" class="tool-btn" title="Close diary">Close</button>
   </div>
+
+  <div class="recap-banner hidden" id="recapBanner"></div>
+  <div class="nudge-banner hidden" id="nudgeBanner"></div>
+  <div class="offline-banner hidden" id="offlineBanner">You're offline — this page will send once you're back online.</div>
 
   <div class="page-wrap">
-    <div class="paper" id="paper">
+    <button class="nav-arrow nav-prev" id="navPrev" title="Previous page">&#8249;</button>
 
-      <div class="entry-line" id="greetingLine"></div>
+    <div class="page-flip-outer">
+      <div class="paper" id="paper">
 
-      <!-- typed input (desktop) -->
-      <textarea id="typedInput" class="typed-input handwriting" placeholder="Dear diary..." rows="3"></textarea>
+        <div class="entry-line" id="greetingLine"></div>
+        <div class="streak-line" id="streakLine"></div>
 
-      <!-- drawn input (touch/pen) -->
-      <canvas id="drawCanvas" class="draw-canvas hidden"></canvas>
+        <!-- typed input (desktop) -->
+        <textarea id="typedInput" class="typed-input handwriting" placeholder="Dear diary..." rows="3"></textarea>
 
-      <div class="reply-area" id="replyArea"></div>
+        <!-- drawn input (touch/pen) -->
+        <canvas id="drawCanvas" class="draw-canvas hidden"></canvas>
 
-      <div class="limit-note" id="limitNote"></div>
+        <div class="reply-area" id="replyArea"></div>
+
+        <div class="limit-note" id="limitNote"></div>
+      </div>
     </div>
+
+    <button class="nav-arrow nav-next" id="navNext" title="Next page">&#8250;</button>
   </div>
+
+  <div class="insights-panel hidden" id="insightsPanel"></div>
 </div>
 
 <script src="js/canvas.js"></script>
+<script src="js/audio.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
