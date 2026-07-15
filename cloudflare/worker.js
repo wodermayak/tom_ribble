@@ -1,3 +1,4 @@
+
 /* ===================================================
    THUNDER'S DIARY — cloudflare/worker.js
    Tiny Cloudflare Worker backed by a D1 database, giving
