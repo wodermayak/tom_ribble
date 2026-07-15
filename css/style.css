@@ -152,6 +152,16 @@ body[data-cover="green"] .book-cover-front{ background: radial-gradient(circle a
 }
 .cover-swatch.selected{ box-shadow:0 0 0 3px var(--accent-purple); }
 
+.ob-privacy-note{
+  font-size:12.5px; color:#8b7aa8; opacity:.85; margin:-4px 0 14px; line-height:1.4;
+}
+
+/* visible keyboard focus ring across interactive elements */
+button:focus-visible, input:focus-visible, textarea:focus-visible, .choice:focus-visible, .cover-swatch:focus-visible{
+  outline: 2.5px solid var(--accent-purple);
+  outline-offset: 2px;
+}
+
 .btn-next{
   padding:11px 26px; border-radius:16px; border:none; cursor:pointer;
   background:linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
@@ -191,6 +201,45 @@ body[data-cover="green"] .book-cover-front{ background: radial-gradient(circle a
 .recap-banner{ background:rgba(167,139,250,0.15); color:#5a3d8a; }
 .nudge-banner{ background:rgba(96,165,250,0.15); color:#2c4a75; }
 .offline-banner{ background:rgba(178,59,59,0.12); color:#8a3535; }
+.backup-banner{
+  background:rgba(201,138,43,0.15); color:#8a5a1a;
+  display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;
+}
+.backup-banner .tool-btn{ font-size:12px; padding:5px 10px; }
+
+/* Cloud Sync settings panel */
+.sync-panel{
+  position:fixed; top:56px; right:16px; z-index:40; width:min(320px, 90vw);
+  background:rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+  border-radius:16px; padding:18px 20px; box-shadow:0 10px 30px rgba(124,58,237,0.2);
+  font-family:'Cormorant Garamond', serif; color:#4c3575;
+}
+.sync-panel h3{ margin:0 0 8px; font-size:18px; }
+.sync-note{ font-size:13px; color:#6b5b8a; margin:0 0 10px; line-height:1.4; }
+.sync-label{ display:block; font-size:13px; color:#5a3d8a; margin-bottom:10px; }
+.sync-label input{
+  display:block; width:100%; margin-top:4px; padding:8px 10px; border-radius:10px;
+  border:1px solid var(--accent-purple-soft); font-family:inherit; font-size:14px; outline:none;
+}
+.sync-row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+.sync-id-badge{
+  font-family:monospace; font-size:11px; background:rgba(124,58,237,0.1);
+  padding:3px 8px; border-radius:8px; word-break:break-all;
+}
+.sync-status{ font-size:12.5px; color:#8a5a1a; min-height:16px; margin:8px 0 0; }
+
+/* mood tagging in the memory list */
+.mood-dot{
+  display:inline-block; width:9px; height:9px; border-radius:50%;
+  margin-right:7px; vertical-align:middle;
+}
+.mood-filter-chips{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.mood-chip{
+  border:1px solid var(--line); background:#fff; border-radius:12px;
+  padding:3px 10px; font-size:12px; cursor:pointer; color:#6b5b8a;
+  font-family:'Cormorant Garamond', serif;
+}
+.mood-chip.active{ background:var(--accent-purple); color:#fff; border-color:transparent; }
 
 .page-wrap{
   flex:1; display:flex; justify-content:center; align-items:flex-start;
@@ -247,11 +296,35 @@ body[data-cover="green"] .book-cover-front{ background: radial-gradient(circle a
 }
 .typed-input.absorbing{ opacity:0.08; filter:blur(1.5px); }
 
+.canvas-wrap{ position:relative; width:100%; }
+
 .draw-canvas{
   width:100%; height:260px; touch-action:none; cursor:crosshair;
   transition: opacity 1.1s ease, filter 1.1s ease;
+  display:block;
 }
 .draw-canvas.absorbing{ opacity:0.08; filter:blur(1.5px); }
+
+/* Fullscreen writing mode — either the real Fullscreen API (canvas-wrap
+   becomes the fullscreen element, browser chrome disappears) or, where
+   that's blocked/unsupported (notably iOS Safari), a CSS-only overlay that
+   fills the viewport instead. Both end up visually identical. */
+.canvas-wrap:fullscreen{ background: var(--paper); display:flex; flex-direction:column; }
+.canvas-wrap:-webkit-full-screen{ background: var(--paper); display:flex; flex-direction:column; }
+.canvas-wrap.fullscreen-fallback{
+  position:fixed; inset:0; z-index:200; background: var(--paper);
+  display:flex; flex-direction:column;
+}
+.canvas-wrap.fullscreen-active .draw-canvas{ flex:1; height:100%; }
+
+.canvas-fs-toolbar{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  padding:10px 14px; background:rgba(255,255,255,0.75); backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.canvas-fs-toolbar .ink-colors{ margin-right:auto; }
+.fs-exit-btn{ background: var(--accent-purple); color:#fff; }
+.fs-exit-btn:hover{ background: var(--accent-purple); opacity:.9; }
 
 .reply-area{
   font-family:'Caveat', cursive;
@@ -295,4 +368,42 @@ body[data-cover="green"] .book-cover-front{ background: radial-gradient(circle a
   .paper{ padding:26px 20px; }
   .nav-arrow{ position:absolute; top:50%; z-index:5; }
   .nav-prev{ left:4px; } .nav-next{ right:4px; }
+}
+
+/* extra breakpoints: very small phones and tablet-width devices, so the
+   toolbar and drawing area don't just rely on the single 640px cutoff */
+@media (max-width: 380px){
+  .page-toolbar{ gap:5px; padding:8px 10px; }
+  .tool-btn{ padding:6px 9px; font-size:12px; }
+  .draw-canvas{ height:200px; }
+  .sync-panel{ right:8px; left:8px; width:auto; top:auto; bottom:8px; }
+}
+@media (min-width: 641px) and (max-width: 1024px){
+  .draw-canvas{ height:320px; }
+  .page-flip-outer{ width:min(640px, 92%); }
+}
+
+/* dark mode, following the OS/browser preference */
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper: #262130;
+    --paper-edge: #322c40;
+    --ink-default: #e7e2f2;
+    --line: #3a3348;
+    --shadow: rgba(0,0,0,0.5);
+  }
+  html,body{ background: linear-gradient(160deg, #1c1826, #1a2130 60%, #211c2c); }
+  .page-toolbar{ background:rgba(30,26,40,0.7); border-bottom-color:var(--line); }
+  .tool-btn{ background:rgba(167,139,250,0.14); color:#cbb9f5; }
+  .tool-btn:hover{ background:rgba(167,139,250,0.24); }
+  .nav-arrow{ background:rgba(167,139,250,0.14); color:#cbb9f5; }
+  .entry-line, .streak-line, .limit-note{ color:#a894c9; }
+  .onboarding-card{ background:rgba(38,33,48,0.85); border-color:rgba(255,255,255,0.08); }
+  .onboarding-card h2{ color:#e7e2f2; }
+  .onboarding-card p, .ob-privacy-note{ color:#b8a9d9; }
+  #obName, #obDiaryName, .choice, .sync-label input{ background:#2c2638; color:#e7e2f2; }
+  .insights-panel, .sync-panel{ background:rgba(38,33,48,0.92); color:#e7e2f2; }
+  .insights-panel h3, .sync-panel h3{ color:#e7e2f2; }
+  .memory-list, .sync-note{ color:#b8a9d9; }
+  .draw-canvas{ background:#2c2638; }
 }

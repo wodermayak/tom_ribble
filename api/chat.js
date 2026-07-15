@@ -11,13 +11,22 @@
 const TEXT_MODEL = "llama-3.3-70b-versatile";        // EDIT: text-only model
 const VISION_MODEL = "llama-4-scout-17b-16e-instruct"; // EDIT: handwriting-reading model
 
-// EDIT: keep in sync with MOOD_COLORS in js/app.js if you add/remove moods
+// EDIT: keep in sync with MOOD_COLORS in js/app.js if you add/remove moods.
+// This is only the *fallback* keyword scan now — the model is asked to
+// return its own MOOD: label first (see buildMoodInstruction()/extractMood()
+// below), which is more accurate than scanning transcribed words for hits.
 const MOOD_WORDS = {
   sad: ["sad", "lonely", "cry", "down"],
   angry: ["angry", "frustrated", "mad", "furious"],
   anxious: ["anxious", "stressed", "worried", "nervous"],
   happy: ["happy", "excited", "grateful", "proud"],
+  calm: ["calm", "peaceful", "content"],
+  tired: ["tired", "exhausted", "drained"],
+  hopeful: ["hopeful", "motivated", "inspired"],
+  overwhelmed: ["overwhelmed", "confused"],
+  scared: ["scared", "afraid"],
 };
+const VALID_MOODS = Object.keys(MOOD_WORDS);
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
@@ -25,7 +34,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const { profile, question, image, recentEntries } = req.body || {};
+  const { profile, question, image, recentEntries, olderEntry } = req.body || {};
   const apiKey = process.env.GROQ_API_KEY;
 
   if (!apiKey) {
@@ -33,7 +42,10 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const persona = buildPersona(profile, recentEntries);
+  const persona = buildPersona(profile, recentEntries, olderEntry);
+  const moodInstruction = ` Also end your reply on its own new final line with exactly ` +
+    `"MOOD: <word>" where <word> is one of [${VALID_MOODS.join(", ")}] that best matches ` +
+    `the feeling behind what they wrote, or "MOOD: none" if nothing fits — don't invent other words.`;
 
   try {
     let transcribedQuestion = question;
@@ -48,7 +60,9 @@ module.exports = async (req, res) => {
           content: [
             {
               type: "text",
-              text: "Read the handwritten page in this image, then reply to it as the diary, in character. First give the transcription on a line starting with 'TRANSCRIPT:' then a line '---' then your reply.",
+              text: "Read the handwritten page in this image, then reply to it as the diary, in character. " +
+                "First give the transcription on a line starting with 'TRANSCRIPT:' then a line '---' then your reply." +
+                moodInstruction,
             },
             { type: "image_url", image_url: { url: image } },
           ],
@@ -59,24 +73,36 @@ module.exports = async (req, res) => {
       const raw = groqRes.choices?.[0]?.message?.content || "";
       const parts = raw.split("---");
       transcribedQuestion = (parts[0] || "").replace("TRANSCRIPT:", "").trim();
-      const reply = (parts[1] || raw).trim();
-      res.status(200).json({ reply, transcribedQuestion, mood: detectMood(transcribedQuestion) });
+      const { text: reply, mood } = extractMood((parts[1] || raw).trim());
+      res.status(200).json({ reply, transcribedQuestion, mood: mood || detectMood(transcribedQuestion) });
       return;
     }
 
     // Typed input: plain text chat
     messages = [
-      { role: "system", content: persona },
+      { role: "system", content: persona + moodInstruction },
       { role: "user", content: question },
     ];
 
     const groqRes = await callGroq(apiKey, TEXT_MODEL, messages);
-    const reply = groqRes.choices?.[0]?.message?.content || "";
-    res.status(200).json({ reply, transcribedQuestion, mood: detectMood(question) });
+    const raw = groqRes.choices?.[0]?.message?.content || "";
+    const { text: reply, mood } = extractMood(raw);
+    res.status(200).json({ reply, transcribedQuestion, mood: mood || detectMood(question) });
   } catch (err) {
     res.status(500).json({ error: "oracle_failed", detail: String(err) });
   }
 };
+
+// Pulls a trailing "MOOD: <word>" line off the model's reply (if present
+// and valid) and returns the cleaned reply text alongside it. Falls back to
+// null so the caller can run the old keyword-based detectMood() instead.
+function extractMood(text) {
+  const match = text.match(/\n?MOOD:\s*([a-zA-Z]+)\s*$/i);
+  if (!match) return { text, mood: null };
+  const word = match[1].toLowerCase();
+  const cleaned = text.slice(0, match.index).trim();
+  return { text: cleaned || text, mood: VALID_MOODS.includes(word) ? word : null };
+}
 
 async function callGroq(apiKey, model, messages) {
   const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -104,7 +130,7 @@ function detectMood(text = "") {
   return null;
 }
 
-function buildPersona(profile = {}, recentEntries = []) {
+function buildPersona(profile = {}, recentEntries = [], olderEntry = null) {
   const name = profile?.name || "friend";
   const gender = profile?.gender || "they";
   const purpose = profile?.purpose || "both";
@@ -131,6 +157,11 @@ function buildPersona(profile = {}, recentEntries = []) {
       recentEntries.map(e => `[${e.question} -> ${e.answer}]`).join(" | ")
     : "";
 
+  const olderLine = olderEntry
+    ? `This also seems related to an older page they wrote: [${olderEntry.question} -> ${olderEntry.answer}]. ` +
+      `Only bring it up naturally if it's genuinely relevant, don't force it.`
+    : "";
+
   // Always included, regardless of persona/tone — never overridden by other instructions
   const safetyLine =
     "If anything written sounds like real distress, self-harm, or crisis, drop the usual tone " +
@@ -145,5 +176,6 @@ function buildPersona(profile = {}, recentEntries = []) {
     "Speak directly to them, like a diary that truly knows and cares about them. Keep replies under 80 words unless the tone setting or the moment calls for more. Never mention that you are an AI or a language model — stay fully in character as their diary.",
     safetyLine,
     historyLine,
+    olderLine,
   ].filter(Boolean).join(" ");
 }

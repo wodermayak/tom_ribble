@@ -89,6 +89,7 @@
         <button class="choice" data-value="short">Short &amp; sweet</button>
         <button class="choice" data-value="reflective">Longer &amp; reflective</button>
       </div>
+      <p class="ob-privacy-note">This diary stays only on this device — export a backup regularly, or turn on optional Cloud Sync later in Settings.</p>
       <button class="btn-next" id="obFinish">Begin writing</button>
     </div>
   </div>
@@ -97,28 +98,37 @@
 <!-- ============ DIARY PAGE ============ -->
 <div id="diary" class="diary hidden">
 
-  <div class="page-toolbar">
-    <div class="ink-colors" id="inkColors">
-      <button class="swatch" data-color="#2b2b3d" style="background:#2b2b3d" title="Charcoal ink"></button>
-      <button class="swatch" data-color="#3a4fd9" style="background:#3a4fd9" title="Blue ink"></button>
-      <button class="swatch" data-color="#7C3AED" style="background:#7C3AED" title="Purple ink"></button>
-      <button class="swatch" data-color="#b23b3b" style="background:#b23b3b" title="Red ink"></button>
+  <div class="page-toolbar" role="toolbar" aria-label="Diary tools">
+    <div class="ink-colors" id="inkColors" role="group" aria-label="Ink color">
+      <button class="swatch" data-color="#2b2b3d" style="background:#2b2b3d" title="Charcoal ink" aria-label="Charcoal ink"></button>
+      <button class="swatch" data-color="#3a4fd9" style="background:#3a4fd9" title="Blue ink" aria-label="Blue ink"></button>
+      <button class="swatch" data-color="#7C3AED" style="background:#7C3AED" title="Purple ink" aria-label="Purple ink"></button>
+      <button class="swatch" data-color="#b23b3b" style="background:#b23b3b" title="Red ink" aria-label="Red ink"></button>
     </div>
-    <button id="eraserBtn" class="tool-btn" title="Eraser">Eraser</button>
-    <button id="memoryBtn" class="tool-btn" title="What do you remember?">Memory</button>
-    <button id="insightsBtn" class="tool-btn" title="Streak & stats">Insights</button>
-    <button id="soundBtn" class="tool-btn" title="Toggle ambient sound">Sound: off</button>
-    <button id="notifyBtn" class="tool-btn" title="Toggle daily nudge">Nudge: off</button>
-    <button id="exportBtn" class="tool-btn" title="Export entries as JSON">Export</button>
-    <button id="closeBookBtn" class="tool-btn" title="Close diary">Close</button>
+    <button id="eraserBtn" class="tool-btn" title="Eraser" aria-label="Eraser">Eraser</button>
+    <button id="undoBtn" class="tool-btn hidden" title="Undo last stroke" aria-label="Undo last stroke">Undo</button>
+    <button id="fullscreenBtn" class="tool-btn hidden" title="Write fullscreen" aria-label="Write fullscreen" aria-pressed="false">Fullscreen</button>
+    <button id="memoryBtn" class="tool-btn" title="What do you remember?" aria-label="Search past pages">Memory</button>
+    <button id="insightsBtn" class="tool-btn" title="Streak & stats" aria-label="Streak and stats" aria-expanded="false">Insights</button>
+    <button id="syncBtn" class="tool-btn" title="Cloud sync settings" aria-label="Cloud sync settings" aria-expanded="false">Cloud Sync</button>
+    <button id="soundBtn" class="tool-btn" title="Toggle ambient sound" aria-label="Toggle ambient sound">Sound: off</button>
+    <button id="notifyBtn" class="tool-btn" title="Toggle daily nudge" aria-label="Toggle daily reminder notifications">Nudge: off</button>
+    <button id="exportBtn" class="tool-btn" title="Export entries as JSON" aria-label="Export diary as a backup file">Export</button>
+    <button id="closeBookBtn" class="tool-btn" title="Close diary" aria-label="Close diary">Close</button>
   </div>
 
-  <div class="recap-banner hidden" id="recapBanner"></div>
-  <div class="nudge-banner hidden" id="nudgeBanner"></div>
-  <div class="offline-banner hidden" id="offlineBanner">You're offline — this page will send once you're back online.</div>
+  <div class="recap-banner hidden" id="recapBanner" role="status" aria-live="polite"></div>
+  <div class="nudge-banner hidden" id="nudgeBanner" role="status" aria-live="polite"></div>
+  <div class="offline-banner hidden" id="offlineBanner" role="status" aria-live="polite">You're offline — this page will send once you're back online.</div>
+  <div class="backup-banner hidden" id="backupBanner" role="status" aria-live="polite">
+    <span id="backupBannerText"></span>
+    <button id="backupBannerExport" class="tool-btn" aria-label="Export backup now">Export now</button>
+    <button id="backupBannerDismiss" class="tool-btn" aria-label="Dismiss backup reminder">Not now</button>
+  </div>
+  <div class="sync-panel hidden" id="syncPanel" aria-live="polite"></div>
 
   <div class="page-wrap">
-    <button class="nav-arrow nav-prev" id="navPrev" title="Previous page">&#8249;</button>
+    <button class="nav-arrow nav-prev" id="navPrev" title="Previous page" aria-label="Previous page">&#8249;</button>
 
     <div class="page-flip-outer">
       <div class="paper" id="paper">
@@ -127,18 +137,31 @@
         <div class="streak-line" id="streakLine"></div>
 
         <!-- typed input (desktop) -->
-        <textarea id="typedInput" class="typed-input handwriting" placeholder="Dear diary..." rows="3"></textarea>
+        <textarea id="typedInput" class="typed-input handwriting" placeholder="Dear diary..." rows="3" aria-label="Write to your diary"></textarea>
 
         <!-- drawn input (touch/pen) -->
-        <canvas id="drawCanvas" class="draw-canvas hidden"></canvas>
+        <div class="canvas-wrap hidden" id="canvasWrap">
+          <canvas id="drawCanvas" class="draw-canvas" role="img" aria-label="Handwriting canvas — draw with your finger or pen"></canvas>
+          <div class="canvas-fs-toolbar hidden" id="canvasFsToolbar">
+            <div class="ink-colors" id="inkColorsFs" role="group" aria-label="Ink color">
+              <button class="swatch" data-color="#2b2b3d" style="background:#2b2b3d" title="Charcoal ink" aria-label="Charcoal ink"></button>
+              <button class="swatch" data-color="#3a4fd9" style="background:#3a4fd9" title="Blue ink" aria-label="Blue ink"></button>
+              <button class="swatch" data-color="#7C3AED" style="background:#7C3AED" title="Purple ink" aria-label="Purple ink"></button>
+              <button class="swatch" data-color="#b23b3b" style="background:#b23b3b" title="Red ink" aria-label="Red ink"></button>
+            </div>
+            <button id="fsEraserBtn" class="tool-btn" aria-label="Eraser">Eraser</button>
+            <button id="fsUndoBtn" class="tool-btn" aria-label="Undo last stroke">Undo</button>
+            <button id="fsExitBtn" class="tool-btn fs-exit-btn" aria-label="Exit fullscreen">Exit fullscreen</button>
+          </div>
+        </div>
 
-        <div class="reply-area" id="replyArea"></div>
+        <div class="reply-area" id="replyArea" role="status" aria-live="polite" aria-label="Diary's reply"></div>
 
         <div class="limit-note" id="limitNote"></div>
       </div>
     </div>
 
-    <button class="nav-arrow nav-next" id="navNext" title="Next page">&#8250;</button>
+    <button class="nav-arrow nav-next" id="navNext" title="Next page" aria-label="Next page">&#8250;</button>
   </div>
 
   <div class="insights-panel hidden" id="insightsPanel"></div>
@@ -146,6 +169,7 @@
 
 <script src="js/canvas.js"></script>
 <script src="js/audio.js"></script>
+<script src="js/sync.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
