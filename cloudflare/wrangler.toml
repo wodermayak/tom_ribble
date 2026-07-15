@@ -6,5 +6,5 @@ compatibility_date = "2026-07-01"
 # database_id it prints below.
 [[d1_databases]]
 binding = "DB"
-database_name = "thunders_diary"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_name = "tom"
+database_id = "d8f44d90-2b91-4293-8e85-8987af2ded55"
