@@ -302,6 +302,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, .choice:focus
   width:100%; height:260px; touch-action:none; cursor:crosshair;
   transition: opacity 1.1s ease, filter 1.1s ease;
   display:block;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 .draw-canvas.absorbing{ opacity:0.08; filter:blur(1.5px); }
 

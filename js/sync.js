@@ -19,7 +19,7 @@
 window.DiarySync = (function () {
   // EDIT: set a default Worker URL here if you always deploy to the same
   // place, so people don't have to paste it in Settings themselves.
-  const DEFAULT_ENDPOINT = "";
+  const DEFAULT_ENDPOINT = "https://tom-ribble.wmcopy100.workers.dev";
   let pushTimer = null;
   const PUSH_DEBOUNCE_MS = 1500; // EDIT: how long to wait after a change before pushing
 

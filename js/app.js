@@ -112,7 +112,9 @@ const els = {
 
 let idleTimer = null;
 let profile = loadProfile();
-let isTouchDevice = matchMedia("(pointer: coarse)").matches;
+let isTouchDevice = matchMedia("(pointer: coarse)").matches
+  || navigator.maxTouchPoints > 0
+  || "ontouchstart" in window;
 let manualColorChosen = false;
 let currentPageIndex = 0; // set properly once entries are loaded
 
@@ -915,8 +917,12 @@ function renderSyncPanel(status) {
     }
     try {
       line.textContent = "Creating a sync ID...";
-      const newId = DiarySync.getId() ? DiarySync.getId() : await DiarySync.createAndEnable();
-      if (DiarySync.getId() && !newId) { DiarySync.setEnabled(true); await DiarySync.push(); }
+      if (DiarySync.getId()) {
+        DiarySync.setEnabled(true);
+        await DiarySync.push();
+      } else {
+        await DiarySync.createAndEnable();
+      }
       renderSyncPanel("Cloud backup is on.");
     } catch (err) {
       renderSyncPanel(err.message || "Couldn't turn on cloud backup.");
